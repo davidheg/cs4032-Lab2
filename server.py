@@ -5,7 +5,7 @@ import os
 run = True
 max = 10
 address = "10.62.0.213"
-port = 8000
+port = sys.argv[1]
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
@@ -29,7 +29,6 @@ def handleClient(number,conn):
 sock.bind((address,port))
 print "Socket created at IP:%s and port:%s, now listening for clients" %(address,port)
 sock.listen(5)
-
 while run:
     conn, addr = sock.accept()
     threading.Thread(target = handleClient, args =(current,conn,)).start() 
