@@ -8,7 +8,18 @@ max = 10
 address = "10.62.0.213"
 port = int(sys.argv[1])
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+threadpool = []
+numberofThreads = 0
 
+def sortThreadPool():
+        i = 0
+        for thread in threadpool:
+                if(not thread.isAlive()):
+                        threadpool.pop(i)
+                        global numberofThreads
+                        numberofThreads = numberofThreads - 1
+                i = i + 1
+        threadpool.sort()
 
 def handleClient(conn,addr):
     receiving = True
@@ -30,6 +41,12 @@ sock.bind((address,port))
 print "Socket created at IP:%s and port:%d, now listening for clients" %(address,port)
 sock.listen(5)
 while run:
-    conn, addr = sock.accept()
-    threading.Thread(target = handleClient, args =(conn,addr,)).start()
-
+    if numberofThreads < max:
+        conn,addr = sock.accept()
+        threadpool.append(threading.Thread(target = handleClient, args =(conn,addr,)))
+        threadpool[numberofThreads].start()
+        global numberofThreads
+        numberofThreads = numberofThreads + 1
+    else:
+        print "There are no free threads"
+    threading.Thread(target = sortThreadPool).start()
